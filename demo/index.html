@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>js-rich-body-highlighter — rich muscle highlighting</title>
+    <meta
+      name="description"
+      content="A premium muscle map: highlights muscles with mix-blend-mode over a detailed illustration, so they look lit from within instead of painted flat."
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="dot"></span>
+        js-rich-body-highlighter
+      </div>
+      <nav class="links">
+        <a href="https://www.npmjs.com/package/js-rich-body-highlighter" target="_blank" rel="noreferrer">npm</a>
+        <a href="https://github.com/" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <main class="hero">
+      <section class="pitch">
+        <span class="eyebrow">Muscle map · premium look</span>
+        <h1>Muscles that look <em>lit from within</em>, not painted flat.</h1>
+        <p class="lede">
+          Every other body highlighter floods SVG polygons with a solid color. This one blends the
+          highlight over a detailed illustration with
+          <code>mix-blend-mode: multiply</code>, so the red settles into the grooves between
+          bundles. Framework-agnostic core, tiny React wrapper, zero runtime dependencies.
+        </p>
+
+        <div class="controls">
+          <div class="control">
+            <span class="control-label">View</span>
+            <div class="seg" id="view-seg">
+              <button type="button" data-view="front" class="active">Front</button>
+              <button type="button" data-view="back">Back</button>
+            </div>
+          </div>
+
+          <div class="control">
+            <span class="control-label">Blend mode <em class="hint-inline">— this is the whole point</em></span>
+            <div class="seg" id="blend-seg">
+              <button type="button" data-blend="multiply" class="active">Multiply · rich</button>
+              <button type="button" data-blend="normal">Normal · flat</button>
+            </div>
+          </div>
+
+          <div class="control">
+            <span class="control-label">Intensity <span id="intensity-val" class="mono">72</span></span>
+            <input id="intensity" type="range" min="0" max="100" value="72" />
+          </div>
+
+          <div class="control color">
+            <span class="control-label">Color</span>
+            <input id="color" type="color" value="#ff2d2d" />
+          </div>
+        </div>
+
+        <pre class="snippet"><code id="snippet"></code></pre>
+        <p class="foot-note">
+          Showing a placeholder body + one mask (<span class="mono">pectoralis_right</span>). Drop in
+          the real 2048×3072 render and more masks to see it sing.
+        </p>
+      </section>
+
+      <section class="showcase">
+        <div class="frame">
+          <div id="map" class="map"></div>
+          <div id="hover-label" class="hover-label"></div>
+        </div>
+        <p class="showcase-hint">Hover the body to highlight a muscle.</p>
+      </section>
+    </main>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

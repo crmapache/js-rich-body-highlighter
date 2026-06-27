@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "js-rich-body-highlighter": ["./src/index.ts"],
+      "js-rich-body-highlighter/react": ["./src/react/index.tsx"]
+    }
+  },
+  "include": ["playground", "demo"]
+}

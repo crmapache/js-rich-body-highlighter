@@ -1,0 +1,9 @@
+node_modules
+dist
+demo-dist
+.vercel
+.playwright-mcp
+*.log
+.DS_Store
+.idea
+*.tsbuildinfo

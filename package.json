@@ -1,0 +1,66 @@
+{
+  "name": "js-rich-body-highlighter",
+  "version": "0.0.0",
+  "description": "Premium, framework-agnostic muscle map. Highlights muscles with mix-blend-mode over a detailed body illustration for a rich, 3D look instead of flat polygon fills.",
+  "type": "module",
+  "license": "MIT",
+  "author": "",
+  "keywords": [
+    "muscle",
+    "anatomy",
+    "body",
+    "highlighter",
+    "muscle-map",
+    "svg",
+    "fitness",
+    "blend-mode",
+    "react"
+  ],
+  "sideEffects": false,
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "dev:demo": "vite --config vite.demo.config.ts",
+    "build": "tsup",
+    "build:demo": "vite build --config vite.demo.config.ts",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.playground.json",
+    "gen:placeholder": "node scripts/gen-placeholder.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.1.0"
+  }
+}
