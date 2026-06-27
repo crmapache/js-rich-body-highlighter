@@ -8,14 +8,13 @@ import {
 } from 'js-rich-body-highlighter';
 
 const host = document.getElementById('map') as HTMLElement;
-const frame = host.closest('.frame') as HTMLElement;
 const hoverLabel = document.getElementById('hover-label') as HTMLElement;
 const snippetEl = document.getElementById('snippet') as HTMLElement;
 const intensityVal = document.getElementById('intensity-val') as HTMLElement;
 
 let view: BodyView = 'front';
 let gender: Gender = 'male';
-let theme: Theme = 'light';
+let theme: Theme = 'dark';
 let intensity = 72;
 let color = '#ff2d2d';
 let blendMode = 'multiply';
@@ -41,9 +40,10 @@ const map = new MuscleMap(host, {
   onMuscleLeave: () => hoverLabel.classList.remove('on'),
 });
 
-function applyBackdrop(): void {
-  // Dark bodies need a light backdrop to read well, and vice versa.
-  frame?.classList.toggle('on-light', theme === 'dark');
+function applyTheme(): void {
+  // Flip the whole page to match the theme. The body image already contrasts
+  // (dark UI -> light body, light UI -> dark body).
+  document.body.classList.toggle('theme-light', theme === 'light');
 }
 
 // --- controls --------------------------------------------------------------
@@ -73,7 +73,7 @@ segmented('view-seg', 'view', (value) => {
 segmented('theme-seg', 'theme', (value) => {
   theme = value as Theme;
   map.update({ theme });
-  applyBackdrop();
+  applyTheme();
 });
 
 segmented('blend-seg', 'blend', (value) => {
@@ -109,5 +109,5 @@ function renderSnippet(): void {
   ].join('\n');
 }
 
-applyBackdrop();
+applyTheme();
 renderSnippet();

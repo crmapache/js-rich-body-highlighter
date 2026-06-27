@@ -11,6 +11,21 @@
   --muted: #98a0ad;
   --accent: #2b6cff;
   --accent-2: #ff3b3b;
+  --stage-glow: #1a1d24;
+}
+
+body.theme-light {
+  --bg: #e9edf3;
+  --panel: #ffffff;
+  --panel-2: #f1f4f9;
+  --line: #d7dde7;
+  --text: #1a1f29;
+  --muted: #5d6675;
+  --stage-glow: #f7f9fc;
+}
+
+body {
+  transition: background 0.2s;
 }
 
 html,
@@ -38,7 +53,7 @@ body {
   padding: 24px;
   overflow: auto;
   background:
-    radial-gradient(120% 120% at 50% 0%, #1a1d24 0%, var(--bg) 60%);
+    radial-gradient(120% 120% at 50% 0%, var(--stage-glow) 0%, var(--bg) 60%);
 }
 
 .map {

@@ -21,7 +21,7 @@ const registry: MuscleDefinition[] = MUSCLES.map((m) => ({
 
 let view: BodyView = 'front';
 let gender: Gender = 'male';
-let theme: Theme = 'light';
+let theme: Theme = 'dark';
 let selectedId: string | null = null;
 let baseIntensity = 55; // strength of non-selected masks (so you can see them)
 let selectedIntensity = 100; // strength of the selected mask
@@ -73,10 +73,10 @@ function refreshOutline(): void {
   });
 }
 
-function applyBackdrop(): void {
-  // Dark bodies need a light backdrop to be visible (and vice versa).
-  mapHost.style.background = theme === 'dark' ? '#e9edf3' : 'transparent';
-  mapHost.style.borderRadius = '10px';
+function applyTheme(): void {
+  // Flip the whole page background to match the theme. The body image already
+  // contrasts (dark UI -> light body, light UI -> dark body).
+  document.body.classList.toggle('theme-light', theme === 'light');
 }
 
 function selectFirstOfView(): void {
@@ -112,7 +112,7 @@ function setTheme(next: Theme): void {
   if (next === theme) return;
   theme = next;
   map.update({ theme });
-  applyBackdrop();
+  applyTheme();
   renderPanel();
 }
 
@@ -330,6 +330,6 @@ window.addEventListener('keydown', (e) => {
 // --- init ------------------------------------------------------------------
 
 selectFirstOfView();
-applyBackdrop();
+applyTheme();
 renderPanel();
 refreshOutline();
