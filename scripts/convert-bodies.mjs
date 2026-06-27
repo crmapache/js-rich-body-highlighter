@@ -12,19 +12,17 @@ const SRC = join(root, 'assets-src');
 const OUT = join(root, 'src/assets/bodies');
 
 // master PNG -> shipped WebP, named {gender}-{view}-{theme}.
-// NOTE: `theme` is the UI mode the body is meant to sit on, not the body's own
-// color. A LIGHT UI needs a dark-colored body to stay visible, and a DARK UI
-// needs the light/white body. So the "white" masters map to the `dark` theme and
-// the "dark" masters map to the `light` theme.
+// The "white" masters are the light-theme bodies; the "dark" masters are the
+// dark-theme bodies.
 const MAP = {
-  '01_male_front_white_transparent.png': 'male-front-dark.webp',
-  '02_male_back_white_transparent.png': 'male-back-dark.webp',
-  '03_female_front_white_transparent_aligned.png': 'female-front-dark.webp',
-  '04_female_back_white_transparent_aligned.png': 'female-back-dark.webp',
-  '05_male_front_dark_transparent_no_light_outline.png': 'male-front-light.webp',
-  '06_male_back_dark_transparent_no_light_outline.png': 'male-back-light.webp',
-  '07_female_front_dark_transparent_no_light_outline_aligned.png': 'female-front-light.webp',
-  '08_female_back_dark_transparent_no_light_outline_aligned.png': 'female-back-light.webp',
+  '01_male_front_white_transparent.png': 'male-front-light.webp',
+  '02_male_back_white_transparent.png': 'male-back-light.webp',
+  '03_female_front_white_transparent_aligned.png': 'female-front-light.webp',
+  '04_female_back_white_transparent_aligned.png': 'female-back-light.webp',
+  '05_male_front_dark_transparent_no_light_outline.png': 'male-front-dark.webp',
+  '06_male_back_dark_transparent_no_light_outline.png': 'male-back-dark.webp',
+  '07_female_front_dark_transparent_no_light_outline_aligned.png': 'female-front-dark.webp',
+  '08_female_back_dark_transparent_no_light_outline_aligned.png': 'female-back-dark.webp',
 };
 
 mkdirSync(OUT, { recursive: true });
