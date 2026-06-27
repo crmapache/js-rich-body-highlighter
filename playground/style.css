@@ -48,8 +48,8 @@ body {
 
 .stage {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: safe center;
+  justify-content: safe center;
   padding: 24px;
   overflow: auto;
   background:
@@ -57,7 +57,41 @@ body {
 }
 
 .map {
-  width: min(46vh, 420px);
+  width: calc(min(46vh, 420px) * var(--zoom, 1));
+  flex: none;
+}
+
+.zoom {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  width: max-content;
+}
+
+.zoom button {
+  background: transparent;
+  color: var(--text);
+  border: 0;
+  padding: 7px 16px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.zoom button:hover {
+  background: var(--panel-2);
+}
+
+.zoom .zoom-val {
+  min-width: 56px;
+  padding: 0 4px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
 }
 
 .panel {

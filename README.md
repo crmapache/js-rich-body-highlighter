@@ -79,10 +79,10 @@ import { MuscleMap } from 'js-rich-body-highlighter/react';
 
 ### Coordinate system
 
-- Bodies are 2:3 portrait (shipped at 1365×2048). Pixel resolution does not matter
-  for masks: the `<image>` is scaled to fill the viewBox, masks live in the viewBox.
-- SVG `viewBox` (mm @ 96 DPI for a 2048×3072 canvas): `0 0 541.87 812.80`, so
-  `PX2MM = 25.4 / 96 ≈ 0.264583`.
+- Bodies are 2:3 portrait, shipped at 1365×2048.
+- SVG `viewBox` is the body at 96 DPI: `0 0 361.16 541.87` (1365×2048 × PX2MM),
+  so `PX2MM = 25.4 / 96 ≈ 0.264583`. The `<image>` fills it, so a path traced in
+  Inkscape over the body drops in at its native coordinates.
 - Masks are authored in this viewBox, in Inkscape, over the **exact** body image
   version used by the package. A different image scale will not line up.
 - Per-mask `offset` (in source pixels) becomes a `translate(dx dy)` in viewBox
@@ -128,10 +128,11 @@ npm run convert:bodies    # re-export assets-src/*.png -> src/assets/bodies/*.we
 
 ### Playground
 
-- Slider for highlight intensity (0–100).
+- Gender / view / theme switchers and a muscle list to pick each mask.
 - Arrow keys move the selected mask 1px (`Shift` = 10px) and show the
   ready-to-paste `offset` / `translate(...)`.
-- Muscle list to pick and verify each mask.
+- Zoom +/- to magnify the figure for precise positioning.
+- Slider for highlight intensity (0–100).
 
 ## License
 

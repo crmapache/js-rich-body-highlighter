@@ -25,6 +25,7 @@ let theme: Theme = 'dark';
 let selectedId: string | null = null;
 let baseIntensity = 55; // strength of non-selected masks (so you can see them)
 let selectedIntensity = 100; // strength of the selected mask
+let zoom = 1; // magnify the figure (with masks) for precise positioning
 
 const map = new MuscleMap(mapHost, {
   view,
@@ -51,32 +52,28 @@ function computeHighlights() {
 
 function pushHighlights(): void {
   map.update({ highlights: computeHighlights() });
-  refreshOutline();
 }
 
 function rebuildPaths(): void {
   // New registry array reference triggers a path rebuild (picks up offsets).
   map.update({ registry: [...registry], highlights: computeHighlights() });
-  refreshOutline();
-}
-
-function refreshOutline(): void {
-  const svg = map.element;
-  svg.querySelectorAll<SVGPathElement>('path[data-muscle-id]').forEach((path) => {
-    if (path.getAttribute('data-muscle-id') === selectedId) {
-      path.style.stroke = '#2b6cff';
-      path.style.strokeWidth = '1.5';
-      path.style.vectorEffect = 'non-scaling-stroke';
-    } else {
-      path.style.stroke = 'none';
-    }
-  });
 }
 
 function applyTheme(): void {
   // Flip the whole page background to match the theme. The body image already
   // contrasts (dark UI -> light body, light UI -> dark body).
   document.body.classList.toggle('theme-light', theme === 'light');
+}
+
+function applyZoom(): void {
+  // Scales the whole figure (image + masks share one viewBox); the stage scrolls.
+  mapHost.style.setProperty('--zoom', String(zoom));
+}
+
+function setZoom(next: number): void {
+  zoom = Math.min(5, Math.max(0.5, Math.round(next * 100) / 100));
+  applyZoom();
+  renderPanel();
 }
 
 function selectFirstOfView(): void {
@@ -96,7 +93,6 @@ function setView(next: BodyView): void {
   selectFirstOfView();
   map.update({ view, highlights: computeHighlights() });
   renderPanel();
-  refreshOutline();
 }
 
 function setGender(next: Gender): void {
@@ -105,7 +101,6 @@ function setGender(next: Gender): void {
   selectFirstOfView();
   map.update({ gender, highlights: computeHighlights() });
   renderPanel();
-  refreshOutline();
 }
 
 function setTheme(next: Theme): void {
@@ -167,6 +162,7 @@ function renderPanel(): void {
     group('Gender', seg(gender, [['Male', 'male'], ['Female', 'female']], setGender)),
     group('View', seg(view, [['Front', 'front'], ['Back', 'back']], setView)),
     group('Theme', seg(theme, [['Light', 'light'], ['Dark', 'dark']], setTheme)),
+    zoomGroup(),
     muscleListGroup(),
     selectedGroup(selected),
     hintGroup(),
@@ -175,6 +171,17 @@ function renderPanel(): void {
 
 function group(label: string, ...children: Array<Node | string>): HTMLElement {
   return el('div', { class: 'group' }, [el('span', { class: 'label' }, [label]), ...children]);
+}
+
+function zoomGroup(): HTMLElement {
+  return group(
+    'Zoom',
+    el('div', { class: 'zoom' }, [
+      el('button', { title: 'Zoom out', onClick: () => setZoom(zoom - 0.25) }, ['−']),
+      el('span', { class: 'zoom-val' }, [`${Math.round(zoom * 100)}%`]),
+      el('button', { title: 'Zoom in', onClick: () => setZoom(zoom + 0.25) }, ['+']),
+    ]),
+  );
 }
 
 function muscleListGroup(): HTMLElement {
@@ -331,5 +338,5 @@ window.addEventListener('keydown', (e) => {
 
 selectFirstOfView();
 applyTheme();
+applyZoom();
 renderPanel();
-refreshOutline();
