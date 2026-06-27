@@ -12,12 +12,45 @@ import {
 const mapHost = document.getElementById('map') as HTMLDivElement;
 const panel = document.getElementById('panel') as HTMLElement;
 
-// Working copy of the registry so we can live-edit offsets without touching the
-// real source. Every muscle gets a concrete offset for easy nudging.
-const registry: MuscleDefinition[] = MUSCLES.map((m) => ({
+// Working copy of the registry so we can live-edit offsets/spread without
+// touching the real source. `spread` is an authoring aid (see applySpread).
+type EditMuscle = MuscleDefinition & { spread: number };
+
+const registry: EditMuscle[] = MUSCLES.map((m) => ({
   ...m,
   offset: { x: m.offset?.x ?? 0, y: m.offset?.y ?? 0 },
+  spread: 0,
 }));
+
+function subpathCount(d: string): number {
+  return (d.match(/[Mm]/g) ?? []).length;
+}
+
+/**
+ * Move the two symmetric halves of a mask apart (+px) or together (-px). Each
+ * subpath starts with an absolute moveto (M) — except possibly the first, a
+ * lowercase `m` that is absolute as the first path element — so shifting the
+ * leading X by ±spread/2 (depending on which side of the mask center it sits)
+ * shifts the whole subpath. Final values get baked into `d` in the registry.
+ */
+function applySpread(d: string, spreadPx: number): string {
+  if (!spreadPx) return d;
+  const half = (spreadPx * PX2MM) / 2;
+  const moveto = /([Mm])\s*(-?[\d.]+)([\s,]+)(-?[\d.]+)/g;
+  const xs: number[] = [];
+  for (let m = moveto.exec(d); m; m = moveto.exec(d)) xs.push(parseFloat(m[2]!));
+  if (xs.length < 2) return d;
+  const center = (Math.min(...xs) + Math.max(...xs)) / 2;
+  return d.replace(moveto, (_full, cmd: string, x: string, _sep: string, y: string) => {
+    const nx = parseFloat(x) + (parseFloat(x) < center ? -half : half);
+    return `${cmd}${+nx.toFixed(4)} ${y}`;
+  });
+}
+
+// The registry handed to the engine, with each mask's `spread` baked into its `d`.
+function displayRegistry(): MuscleDefinition[] {
+  return registry.map((m) => (m.spread ? { ...m, d: applySpread(m.d, m.spread) } : m));
+}
 
 let view: BodyView = 'front';
 let gender: Gender = 'male';
@@ -55,8 +88,8 @@ function pushHighlights(): void {
 }
 
 function rebuildPaths(): void {
-  // New registry array reference triggers a path rebuild (picks up offsets).
-  map.update({ registry: [...registry], highlights: computeHighlights() });
+  // New registry array reference triggers a path rebuild (picks up offsets/spread).
+  map.update({ registry: displayRegistry(), highlights: computeHighlights() });
 }
 
 function applyTheme(): void {
@@ -202,7 +235,7 @@ function muscleListGroup(): HTMLElement {
   ]);
 }
 
-function selectedGroup(selected: MuscleDefinition | null): HTMLElement {
+function selectedGroup(selected: EditMuscle | null): HTMLElement {
   if (!selected) {
     return el('div', { class: 'group' }, [
       el('span', { class: 'label' }, ['Selected']),
@@ -232,6 +265,26 @@ function selectedGroup(selected: MuscleDefinition | null): HTMLElement {
       pushHighlights();
     },
   });
+
+  // Spread: move the two symmetric halves apart/together (only for masks that
+  // actually have 2+ subpaths). An authoring aid; the value gets baked into `d`.
+  const canSpread = subpathCount(selected.d) >= 2;
+  const spreadLabel = el('span', {}, [spreadText(selected.spread)]);
+  const spreadSlider = el('input', {
+    type: 'range',
+    min: -60,
+    max: 60,
+    value: selected.spread,
+    onInput: (e) => {
+      selected.spread = Number((e.target as HTMLInputElement).value);
+      spreadLabel.textContent = spreadText(selected.spread);
+      rebuildPaths();
+      updateReadout(selected);
+    },
+  });
+  const spreadControl: Array<Node | string> = canSpread
+    ? [el('div', { class: 'row' }, [spreadLabel]), spreadSlider]
+    : [];
 
   const readout = el('div', { class: 'readout', id: 'readout' }, [readoutText(selected)]);
 
@@ -267,9 +320,14 @@ function selectedGroup(selected: MuscleDefinition | null): HTMLElement {
     brightness,
     el('div', { class: 'row' }, [el('span', {}, [`Others ${baseIntensity}`])]),
     base,
+    ...spreadControl,
     readout,
     el('div', { class: 'row' }, [copyBtn, resetBtn]),
   ]);
+}
+
+function spreadText(spread: number): string {
+  return `Spread ${spread > 0 ? '+' : ''}${spread}px`;
 }
 
 function hintGroup(): HTMLElement {
@@ -284,12 +342,13 @@ function hintGroup(): HTMLElement {
   ]);
 }
 
-function readoutText(m: MuscleDefinition): string {
+function readoutText(m: EditMuscle): string {
   const x = m.offset?.x ?? 0;
   const y = m.offset?.y ?? 0;
   const tx = (x * PX2MM).toFixed(4);
   const ty = (y * PX2MM).toFixed(4);
-  return `${m.id}\noffset: { x: ${x}, y: ${y} }\ntransform="translate(${tx} ${ty})"`;
+  const spreadLine = m.spread ? `\nspread: ${m.spread}px` : '';
+  return `${m.id}\noffset: { x: ${x}, y: ${y} }${spreadLine}\ntransform="translate(${tx} ${ty})"`;
 }
 
 function registrySnippet(m: MuscleDefinition): string {
@@ -298,7 +357,7 @@ function registrySnippet(m: MuscleDefinition): string {
   return `offset: { x: ${x}, y: ${y} }`;
 }
 
-function updateReadout(m: MuscleDefinition): void {
+function updateReadout(m: EditMuscle): void {
   const node = document.getElementById('readout');
   if (node) node.textContent = readoutText(m);
 }
