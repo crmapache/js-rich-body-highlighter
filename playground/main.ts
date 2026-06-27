@@ -210,9 +210,9 @@ function zoomGroup(): HTMLElement {
   return group(
     'Zoom',
     el('div', { class: 'zoom' }, [
-      el('button', { title: 'Zoom out', onClick: () => setZoom(zoom - 0.25) }, ['−']),
+      el('button', { title: 'Zoom out', onClick: () => setZoom(zoom - 1) }, ['−']),
       el('span', { class: 'zoom-val' }, [`${Math.round(zoom * 100)}%`]),
-      el('button', { title: 'Zoom in', onClick: () => setZoom(zoom + 0.25) }, ['+']),
+      el('button', { title: 'Zoom in', onClick: () => setZoom(zoom + 1) }, ['+']),
     ]),
   );
 }
