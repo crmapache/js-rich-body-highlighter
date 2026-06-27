@@ -1,9 +1,11 @@
 import {
   MuscleMap,
   MUSCLES,
-  getMusclesByView,
+  getMuscles,
   PX2MM,
   type BodyView,
+  type Gender,
+  type Theme,
   type MuscleDefinition,
 } from 'js-rich-body-highlighter';
 
@@ -18,12 +20,16 @@ const registry: MuscleDefinition[] = MUSCLES.map((m) => ({
 }));
 
 let view: BodyView = 'front';
+let gender: Gender = 'male';
+let theme: Theme = 'light';
 let selectedId: string | null = null;
 let baseIntensity = 55; // strength of non-selected masks (so you can see them)
 let selectedIntensity = 100; // strength of the selected mask
 
 const map = new MuscleMap(mapHost, {
   view,
+  gender,
+  theme,
   registry,
   width: '100%',
   hoverHighlight: true,
@@ -33,7 +39,7 @@ const map = new MuscleMap(mapHost, {
 });
 
 function viewMuscles(): MuscleDefinition[] {
-  return getMusclesByView(view, registry);
+  return getMuscles(gender, view, registry);
 }
 
 function computeHighlights() {
@@ -67,6 +73,17 @@ function refreshOutline(): void {
   });
 }
 
+function applyBackdrop(): void {
+  // Dark bodies need a light backdrop to be visible (and vice versa).
+  mapHost.style.background = theme === 'dark' ? '#e9edf3' : 'transparent';
+  mapHost.style.borderRadius = '10px';
+}
+
+function selectFirstOfView(): void {
+  const first = viewMuscles()[0];
+  selectedId = first ? first.id : null;
+}
+
 function selectMuscle(id: string | null): void {
   selectedId = id;
   renderPanel();
@@ -76,11 +93,27 @@ function selectMuscle(id: string | null): void {
 function setView(next: BodyView): void {
   if (next === view) return;
   view = next;
-  const first = viewMuscles()[0];
-  selectedId = first ? first.id : null;
+  selectFirstOfView();
   map.update({ view, highlights: computeHighlights() });
   renderPanel();
   refreshOutline();
+}
+
+function setGender(next: Gender): void {
+  if (next === gender) return;
+  gender = next;
+  selectFirstOfView();
+  map.update({ gender, highlights: computeHighlights() });
+  renderPanel();
+  refreshOutline();
+}
+
+function setTheme(next: Theme): void {
+  if (next === theme) return;
+  theme = next;
+  map.update({ theme });
+  applyBackdrop();
+  renderPanel();
 }
 
 // --- tiny DOM helper -------------------------------------------------------
@@ -108,6 +141,20 @@ function el<K extends keyof HTMLElementTagNameMap>(
   return node;
 }
 
+function seg<T extends string>(
+  current: T,
+  options: Array<[label: string, value: T]>,
+  onPick: (value: T) => void,
+): HTMLElement {
+  return el(
+    'div',
+    { class: 'seg' },
+    options.map(([label, value]) =>
+      el('button', { 'aria-pressed': current === value, onClick: () => onPick(value) }, [label]),
+    ),
+  );
+}
+
 // --- panel -----------------------------------------------------------------
 
 function renderPanel(): void {
@@ -115,22 +162,19 @@ function renderPanel(): void {
   panel.replaceChildren(
     el('h1', {}, [
       'js-rich-body-highlighter',
-      el('small', {}, ['mask playground · placeholder body']),
+      el('small', {}, ['mask playground']),
     ]),
-    viewToggle(),
+    group('Gender', seg(gender, [['Male', 'male'], ['Female', 'female']], setGender)),
+    group('View', seg(view, [['Front', 'front'], ['Back', 'back']], setView)),
+    group('Theme', seg(theme, [['Light', 'light'], ['Dark', 'dark']], setTheme)),
     muscleListGroup(),
     selectedGroup(selected),
     hintGroup(),
   );
 }
 
-function viewToggle(): HTMLElement {
-  const make = (label: string, v: BodyView) =>
-    el('button', { 'aria-pressed': view === v, onClick: () => setView(v) }, [label]);
-  return el('div', { class: 'group' }, [
-    el('span', { class: 'label' }, ['View']),
-    el('div', { class: 'seg' }, [make('Front', 'front'), make('Back', 'back')]),
-  ]);
+function group(label: string, ...children: Array<Node | string>): HTMLElement {
+  return el('div', { class: 'group' }, [el('span', { class: 'label' }, [label]), ...children]);
 }
 
 function muscleListGroup(): HTMLElement {
@@ -143,7 +187,7 @@ function muscleListGroup(): HTMLElement {
           [el('span', {}, [m.name]), el('span', { class: 'tag' }, [m.group])],
         ),
       )
-    : [el('div', { class: 'empty' }, ['No masks in this view yet.'])];
+    : [el('div', { class: 'empty' }, [`No ${gender} ${view} masks yet.`])];
 
   return el('div', { class: 'group' }, [
     el('span', { class: 'label' }, [`Muscles (${muscles.length})`]),
@@ -212,9 +256,7 @@ function selectedGroup(selected: MuscleDefinition | null): HTMLElement {
 
   return el('div', { class: 'group' }, [
     el('span', { class: 'label' }, ['Selected']),
-    el('div', { class: 'row' }, [
-      el('span', {}, [`Brightness ${selectedIntensity}`]),
-    ]),
+    el('div', { class: 'row' }, [el('span', {}, [`Brightness ${selectedIntensity}`])]),
     brightness,
     el('div', { class: 'row' }, [el('span', {}, [`Others ${baseIntensity}`])]),
     base,
@@ -230,7 +272,7 @@ function hintGroup(): HTMLElement {
       el('kbd', {}, ['←↑↓→']),
       ' (1px), hold ',
       el('kbd', {}, ['Shift']),
-      ' for 10px. Drop the real body PNG into src/assets/ to replace the placeholder.',
+      ' for 10px. Masks are per gender + view; theme just swaps the image.',
     ]),
   ]);
 }
@@ -287,6 +329,7 @@ window.addEventListener('keydown', (e) => {
 
 // --- init ------------------------------------------------------------------
 
-selectedId = viewMuscles()[0]?.id ?? null;
+selectFirstOfView();
+applyBackdrop();
 renderPanel();
 refreshOutline();

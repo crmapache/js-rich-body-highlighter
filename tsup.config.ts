@@ -2,8 +2,8 @@ import { defineConfig } from 'tsup';
 import { cpSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-const ASSET_SRC = 'src/assets';
-const ASSET_OUT = 'dist';
+const ASSET_SRC = 'src/assets/bodies';
+const ASSET_OUT = 'dist/bodies';
 
 export default defineConfig({
   entry: {
@@ -22,15 +22,15 @@ export default defineConfig({
   esbuildOptions(options) {
     options.jsx = 'automatic';
   },
-  // The default body image is referenced with `new URL('./<file>', import.meta.url)`,
+  // Body images are referenced with `new URL('./bodies/<file>', import.meta.url)`,
   // which downstream bundlers (Vite/webpack5/Rollup) understand and re-emit. esbuild
-  // leaves the string verbatim but does not copy the file, so we copy assets into
-  // dist/ next to the chunk that resolves them. Keeps the JS engine light.
+  // leaves the string verbatim but does not copy the file, so we copy the bodies
+  // into dist/bodies next to the chunk that resolves them. Keeps the JS engine light.
   async onSuccess() {
     if (!existsSync(ASSET_SRC)) return;
     mkdirSync(ASSET_OUT, { recursive: true });
     for (const file of readdirSync(ASSET_SRC)) {
-      if (file.toLowerCase().endsWith('.png')) {
+      if (file.toLowerCase().endsWith('.webp')) {
         cpSync(join(ASSET_SRC, file), join(ASSET_OUT, file));
       }
     }

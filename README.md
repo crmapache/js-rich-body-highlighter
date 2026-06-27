@@ -13,9 +13,9 @@ dimensional rather than painted flat. That richer look is the whole point.
 - **Adaptive size** for free: image and masks share one SVG `viewBox`, so sizing
   the `<svg>` scales everything together.
 
-> Status: early scaffold. Ships one front-view mask (`pectoralis_right`) and a
-> lightweight **placeholder** body image. Replace `src/assets/01_male_front_white.png`
-> with the real 2048×3072 render, then add masks one at a time via the playground.
+> Status: early. Ships 8 bundled bodies (male/female × front/back × light/dark,
+> ~0.66 MB total as WebP) and one front-view mask (`pectoralis_right`). Masks are
+> added one at a time via the playground.
 
 ## Install
 
@@ -55,6 +55,8 @@ import { MuscleMap } from 'js-rich-body-highlighter/react';
 | Option           | Type                                   | Default       | Notes |
 | ---------------- | -------------------------------------- | ------------- | ----- |
 | `view`           | `'front' \| 'back'`                    | `'front'`     | |
+| `gender`         | `'male' \| 'female'`                   | `'male'`      | picks body + mask set |
+| `theme`          | `'light' \| 'dark'`                    | `'light'`     | swaps body image only |
 | `highlights`     | `{ id, intensity }[]`                  | `[]`          | `intensity` is 0–100 |
 | `width`          | `number \| string`                     | `'100%'`      | px number or CSS string |
 | `height`         | `number \| string`                     | `'auto'`      | derived from body aspect ratio |
@@ -77,8 +79,10 @@ import { MuscleMap } from 'js-rich-body-highlighter/react';
 
 ### Coordinate system
 
-- Body image: 2048×3072 px.
-- SVG `viewBox` (mm @ 96 DPI): `0 0 541.87 812.80`, so `PX2MM = 25.4 / 96 ≈ 0.264583`.
+- Bodies are 2:3 portrait (shipped at 1365×2048). Pixel resolution does not matter
+  for masks: the `<image>` is scaled to fill the viewBox, masks live in the viewBox.
+- SVG `viewBox` (mm @ 96 DPI for a 2048×3072 canvas): `0 0 541.87 812.80`, so
+  `PX2MM = 25.4 / 96 ≈ 0.264583`.
 - Masks are authored in this viewBox, in Inkscape, over the **exact** body image
   version used by the package. A different image scale will not line up.
 - Per-mask `offset` (in source pixels) becomes a `translate(dx dy)` in viewBox
@@ -94,13 +98,19 @@ import { MuscleMap } from 'js-rich-body-highlighter/react';
      id: 'biceps_left',
      name: 'Biceps brachii (left)',
      group: 'arms',
+     gender: 'male',
      side: 'left',
      view: 'front',
      d: 'm... z',
    }
    ```
 
-3. Run the playground, check the fit, nudge with arrow keys, copy the `offset`.
+3. Run the playground, pick the matching gender + view, check the fit, nudge with
+   arrow keys, copy the `offset`.
+
+Masks are filtered by `gender` + `view` (`getMuscles(gender, view)`); male and
+female anatomy differ, so each needs its own masks. The `theme` only swaps the
+body image, so light/dark share the same masks.
 
 `id` uses the anatomical side (the depicted person's side): on the front view,
 the body's right muscle is on the **left** of the screen.
@@ -109,10 +119,11 @@ the body's right muscle is on the **left** of the screen.
 
 ```sh
 npm install
-npm run gen:placeholder   # regenerate the placeholder body image
 npm run dev               # playground at http://localhost:5173
+npm run dev:demo          # showcase/preview (deployed to Vercel)
 npm run build             # build dist/ (core + react) with tsup
 npm run typecheck
+npm run convert:bodies    # re-export assets-src/*.png -> src/assets/bodies/*.webp
 ```
 
 ### Playground

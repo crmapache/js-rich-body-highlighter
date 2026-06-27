@@ -1,4 +1,4 @@
-import type { BodyView, MuscleDefinition } from '../data/types';
+import type { BodyView, Gender, MuscleDefinition, Theme } from '../data/types';
 
 export interface Highlight {
   /** Muscle id from the registry. */
@@ -8,14 +8,19 @@ export interface Highlight {
 }
 
 /**
- * Body image source. A single string is used for the currently shown view;
- * pass `{ front, back }` to set both independently.
+ * Body image source override. A single string is used for the currently shown
+ * view; pass `{ front, back }` to set both. When set, it wins over the bundled
+ * gender/theme default.
  */
 export type BodySrc = string | Partial<Record<BodyView, string>>;
 
 export interface MuscleMapOptions {
   /** Which view to render. Default `'front'`. */
   view?: BodyView;
+  /** Which body to render. Default `'male'`. */
+  gender?: Gender;
+  /** Light or dark body illustration. Default `'light'`. */
+  theme?: Theme;
   /** Data-driven highlights. */
   highlights?: Highlight[];
   /** Width of the map: number (px) or CSS string. Default `'100%'`. */
@@ -36,7 +41,10 @@ export interface MuscleMapOptions {
   registry?: MuscleDefinition[];
   /** Extra class applied to the root `<svg>`. */
   className?: string;
-  onMuscleEnter?: (id: string, event: MouseEvent) => void;
-  onMuscleLeave?: (id: string, event: MouseEvent) => void;
+  /** Fires when the pointer enters a muscle (no event when fired programmatically). */
+  onMuscleEnter?: (id: string, event?: MouseEvent) => void;
+  /** Fires when a muscle is left, incl. on view/gender/registry change while hovered. */
+  onMuscleLeave?: (id: string, event?: MouseEvent) => void;
+  /** Fires on click of a muscle. */
   onMuscleClick?: (id: string, event: MouseEvent) => void;
 }

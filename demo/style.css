@@ -259,10 +259,16 @@ input[type="color"] {
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
+.frame.on-light {
+  background: linear-gradient(180deg, #f4f6fa, #e6eaf1);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
 .map {
   width: 100%;
   border-radius: 12px;
   overflow: hidden;
+  transition: background 0.2s;
 }
 
 .hover-label {

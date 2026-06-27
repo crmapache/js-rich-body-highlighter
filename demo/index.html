@@ -37,6 +37,14 @@
 
         <div class="controls">
           <div class="control">
+            <span class="control-label">Gender</span>
+            <div class="seg" id="gender-seg">
+              <button type="button" data-gender="male" class="active">Male</button>
+              <button type="button" data-gender="female">Female</button>
+            </div>
+          </div>
+
+          <div class="control">
             <span class="control-label">View</span>
             <div class="seg" id="view-seg">
               <button type="button" data-view="front" class="active">Front</button>
@@ -45,10 +53,18 @@
           </div>
 
           <div class="control">
-            <span class="control-label">Blend mode <em class="hint-inline">— this is the whole point</em></span>
+            <span class="control-label">Theme</span>
+            <div class="seg" id="theme-seg">
+              <button type="button" data-theme="light" class="active">Light</button>
+              <button type="button" data-theme="dark">Dark</button>
+            </div>
+          </div>
+
+          <div class="control">
+            <span class="control-label">Blend <em class="hint-inline">— the whole point</em></span>
             <div class="seg" id="blend-seg">
               <button type="button" data-blend="multiply" class="active">Multiply · rich</button>
-              <button type="button" data-blend="normal">Normal · flat</button>
+              <button type="button" data-blend="normal">Flat</button>
             </div>
           </div>
 

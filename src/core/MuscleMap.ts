@@ -1,10 +1,12 @@
-import type { BodyView, MuscleDefinition } from '../data/types';
-import { MUSCLES, getMusclesByView } from '../data/registry';
-import { defaultBodyBack, defaultBodyFront } from '../assets';
+import type { BodyView, Gender, MuscleDefinition, Theme } from '../data/types';
+import { MUSCLES, getMuscles } from '../data/registry';
+import { defaultBody } from '../assets';
 import {
   DEFAULT_BLEND_MODE,
   DEFAULT_COLOR,
+  DEFAULT_GENDER,
   DEFAULT_HOVER_INTENSITY,
+  DEFAULT_THEME,
   DEFAULT_VIEW,
   PX2MM,
   SVG_NS,
@@ -37,6 +39,8 @@ export class MuscleMap {
   private readonly container: HTMLElement;
   private options: MuscleMapOptions;
   private view: BodyView;
+  private gender: Gender;
+  private theme: Theme;
 
   private svg!: SVGSVGElement;
   private image!: SVGImageElement;
@@ -52,6 +56,8 @@ export class MuscleMap {
     this.container = container;
     this.options = { ...options };
     this.view = options.view ?? DEFAULT_VIEW;
+    this.gender = options.gender ?? DEFAULT_GENDER;
+    this.theme = options.theme ?? DEFAULT_THEME;
     this.mount();
   }
 
@@ -62,43 +68,58 @@ export class MuscleMap {
 
   // --- public API ----------------------------------------------------------
 
-  /** Merge new options and apply the minimal DOM updates needed. */
+  /**
+   * Merge new options and apply the minimal DOM updates needed. Change detection
+   * compares *resolved* values (option ?? default), so setting an option back to
+   * `undefined` correctly reverts it to its default.
+   */
   update(partial: Partial<MuscleMapOptions> = {}): void {
     if (this.destroyed) return;
     const prev = this.options;
-    this.options = { ...prev, ...partial };
+    const next = { ...prev, ...partial };
+    this.options = next;
 
-    const nextView = this.options.view ?? DEFAULT_VIEW;
+    const nextView = next.view ?? DEFAULT_VIEW;
+    const nextGender = next.gender ?? DEFAULT_GENDER;
+    const nextTheme = next.theme ?? DEFAULT_THEME;
+
     const viewChanged = nextView !== this.view;
-    const registryChanged = 'registry' in partial && partial.registry !== prev.registry;
-    const bodyChanged = 'bodySrc' in partial && partial.bodySrc !== prev.bodySrc;
+    const genderChanged = nextGender !== this.gender;
+    const themeChanged = nextTheme !== this.theme;
+    const registryChanged = (next.registry ?? MUSCLES) !== (prev.registry ?? MUSCLES);
+    const bodyChanged = next.bodySrc !== prev.bodySrc;
 
-    if (viewChanged) this.view = nextView;
+    this.view = nextView;
+    this.gender = nextGender;
+    this.theme = nextTheme;
 
-    if (viewChanged || registryChanged) {
-      this.renderPaths(); // rebuilds paths and re-applies color/blend/highlights
+    // The set of paths depends on gender + view + registry.
+    if (viewChanged || genderChanged || registryChanged) {
+      this.renderPaths(); // re-applies color/blend/highlights for the new set
     } else {
-      if (partial.color !== undefined && partial.color !== prev.color) this.applyColor();
-      if (partial.blendMode !== undefined && partial.blendMode !== prev.blendMode) this.applyBlend();
+      if ((next.color ?? DEFAULT_COLOR) !== (prev.color ?? DEFAULT_COLOR)) this.applyColor();
+      if ((next.blendMode ?? DEFAULT_BLEND_MODE) !== (prev.blendMode ?? DEFAULT_BLEND_MODE)) {
+        this.applyBlend();
+      }
       this.applyHighlights();
     }
 
-    if (viewChanged || bodyChanged) this.applyImage();
-    if (partial.width !== undefined || partial.height !== undefined) this.applySize();
-    if (partial.className !== undefined && partial.className !== prev.className) this.applyClassName();
+    if (viewChanged || genderChanged || themeChanged || bodyChanged) this.applyImage();
+    if (next.width !== prev.width || next.height !== prev.height) this.applySize();
+    if ((next.className ?? '') !== (prev.className ?? '')) this.applyClassName();
   }
 
-  /** Remove the SVG and detach listeners. */
+  /** Remove the SVG and detach listeners. Fires a paired leave if still hovered. */
   destroy(): void {
     if (this.destroyed) return;
     this.destroyed = true;
+    this.clearHovered();
     this.layer.removeEventListener('pointerover', this.onPointerOver);
     this.layer.removeEventListener('pointerout', this.onPointerOut);
     this.layer.removeEventListener('click', this.onClick);
     this.svg.remove();
     this.paths.clear();
     this.appliedOpacity.clear();
-    this.hoveredId = null;
   }
 
   // --- build ---------------------------------------------------------------
@@ -146,15 +167,15 @@ export class MuscleMap {
   }
 
   private renderPaths(): void {
+    this.clearHovered();
     this.layer.replaceChildren();
     this.paths.clear();
     this.appliedOpacity.clear();
-    this.hoveredId = null;
 
     const color = this.options.color ?? DEFAULT_COLOR;
     const blend = this.options.blendMode ?? DEFAULT_BLEND_MODE;
 
-    for (const muscle of getMusclesByView(this.view, this.registry)) {
+    for (const muscle of getMuscles(this.gender, this.view, this.registry)) {
       const path = document.createElementNS(SVG_NS, 'path');
       path.setAttribute('d', muscle.d);
       path.setAttribute('fill', color);
@@ -175,16 +196,9 @@ export class MuscleMap {
   // --- granular appliers ---------------------------------------------------
 
   private applyImage(): void {
-    const src = this.resolveBodySrc(this.view);
-    if (src) {
-      this.image.setAttribute('href', src);
-      this.image.setAttributeNS(XLINK_NS, 'xlink:href', src);
-      this.image.style.removeProperty('display');
-    } else {
-      this.image.removeAttribute('href');
-      this.image.removeAttributeNS(XLINK_NS, 'href');
-      this.image.style.display = 'none';
-    }
+    const src = this.resolveBodySrc();
+    this.image.setAttribute('href', src);
+    this.image.setAttributeNS(XLINK_NS, 'xlink:href', src);
   }
 
   private applySize(): void {
@@ -234,24 +248,32 @@ export class MuscleMap {
     return map;
   }
 
-  private resolveBodySrc(view: BodyView): string | null {
+  private resolveBodySrc(): string {
     const src = this.options.bodySrc;
     if (typeof src === 'string') return src;
     if (src && typeof src === 'object') {
-      const v = src[view];
+      const v = src[this.view];
       if (v) return v;
     }
-    return view === 'front' ? defaultBodyFront : defaultBodyBack;
+    return defaultBody(this.gender, this.view, this.theme);
   }
 
   // --- events --------------------------------------------------------------
 
-  private setHovered(id: string | null, event: MouseEvent): void {
+  /** Clear hover state, firing a paired onMuscleLeave if one was active. */
+  private clearHovered(event?: MouseEvent): void {
+    if (this.hoveredId === null) return;
+    const prev = this.hoveredId;
+    this.hoveredId = null;
+    this.options.onMuscleLeave?.(prev, event);
+  }
+
+  private setHovered(id: string | null, event?: MouseEvent): void {
     if (id === this.hoveredId) return;
     const prev = this.hoveredId;
     this.hoveredId = id;
-    if (prev) this.options.onMuscleLeave?.(prev, event);
-    if (id) this.options.onMuscleEnter?.(id, event);
+    if (prev !== null) this.options.onMuscleLeave?.(prev, event);
+    if (id !== null) this.options.onMuscleEnter?.(id, event);
     if (this.options.hoverHighlight ?? true) this.applyHighlights();
   }
 

@@ -10,31 +10,36 @@ export interface MuscleMapProps extends MuscleMapOptions {
   style?: CSSProperties;
 }
 
-// Option keys forwarded to the core engine. `className`/`style` are intentionally
-// excluded: they style the React wrapper element, not the inner <svg>.
-const OPTION_KEYS = [
-  'view',
-  'highlights',
-  'width',
-  'height',
-  'color',
-  'blendMode',
-  'hoverHighlight',
-  'hoverIntensity',
-  'bodySrc',
-  'registry',
-  'onMuscleEnter',
-  'onMuscleLeave',
-  'onMuscleClick',
-] as const satisfies ReadonlyArray<keyof MuscleMapOptions>;
+// Every option key is forwarded to the core engine. The `satisfies Record<...>`
+// makes this EXHAUSTIVE: add an option to MuscleMapOptions and forget it here, and
+// this fails to compile, so the wrapper can never silently drop a prop. `className`
+// is deliberately excluded: in React it styles the wrapper element, not the <svg>.
+const OPTION_KEY_SET = {
+  view: true,
+  gender: true,
+  theme: true,
+  highlights: true,
+  width: true,
+  height: true,
+  color: true,
+  blendMode: true,
+  hoverHighlight: true,
+  hoverIntensity: true,
+  bodySrc: true,
+  registry: true,
+  onMuscleEnter: true,
+  onMuscleLeave: true,
+  onMuscleClick: true,
+} satisfies Record<Exclude<keyof MuscleMapOptions, 'className'>, true>;
+
+const OPTION_KEYS = Object.keys(OPTION_KEY_SET) as Array<keyof typeof OPTION_KEY_SET>;
 
 function toOptions(props: MuscleMapProps): MuscleMapOptions {
   const out: MuscleMapOptions = {};
   for (const key of OPTION_KEYS) {
-    const value = props[key];
-    if (value !== undefined) {
-      (out as Record<string, unknown>)[key] = value;
-    }
+    // Forward every key, including `undefined`, so the engine can reset a prop
+    // to its default when it goes from a value back to undefined (declarative).
+    (out as Record<string, unknown>)[key] = props[key];
   }
   return out;
 }
@@ -71,16 +76,14 @@ export function MuscleMap(props: MuscleMapProps): ReactElement {
   return <div ref={hostRef} className={props.className} style={props.style} />;
 }
 
-export type {
-  MuscleMapOptions,
-  Highlight,
-  BodySrc,
-} from '../core/types';
+export type { MuscleMapOptions, Highlight, BodySrc } from '../core/types';
 export type {
   MuscleDefinition,
   MuscleGroup,
   MuscleSide,
   MuscleOffset,
   BodyView,
+  Gender,
+  Theme,
 } from '../data/types';
-export { MUSCLES, getMuscle, getMusclesByView } from '../data/registry';
+export { MUSCLES, getMuscle, getMuscles } from '../data/registry';
