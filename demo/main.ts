@@ -1,113 +1,98 @@
 import {
   MuscleMap,
-  MUSCLES,
-  getMuscles,
-  type BodyView,
+  MUSCLE_GROUPS,
   type Gender,
   type Theme,
+  type Highlight,
+  type MuscleGroup,
+  type MuscleMapOptions,
 } from 'js-rich-body-highlighter';
 
-const host = document.getElementById('map') as HTMLElement;
-const hoverLabel = document.getElementById('hover-label') as HTMLElement;
-const snippetEl = document.getElementById('snippet') as HTMLElement;
-const intensityVal = document.getElementById('intensity-val') as HTMLElement;
+const frontHost = document.getElementById('map-front') as HTMLElement;
+const backHost = document.getElementById('map-back') as HTMLElement;
+const presetList = document.getElementById('presets') as HTMLElement;
 
-let view: BodyView = 'front';
 let gender: Gender = 'female';
 let theme: Theme = 'dark';
-let intensity = 72;
-let color = '#ff2d2d';
-let blendMode = 'multiply';
 
-function demoHighlights() {
-  // Light up every mask in the current gender + view so the effect reads at once.
-  return getMuscles(gender, view, MUSCLES).map((m) => ({ id: m.id, intensity }));
+interface Preset {
+  label: string;
+  groups: MuscleGroup[];
 }
 
-const map = new MuscleMap(host, {
-  view,
-  gender,
-  theme,
-  color,
-  blendMode,
-  hoverHighlight: true,
-  hoverIntensity: 100,
-  highlights: demoHighlights(),
-  onMuscleEnter: (id) => {
-    hoverLabel.textContent = MUSCLES.find((m) => m.id === id)?.name ?? id;
-    hoverLabel.classList.add('on');
-  },
-  onMuscleLeave: () => hoverLabel.classList.remove('on'),
-});
+// Classic training splits — each lights up the muscle groups it works. Targeting
+// by `group` (not mask id) is the whole point: one entry covers both bodies.
+const PRESETS: Preset[] = [
+  { label: 'Push', groups: ['chest', 'shoulders', 'triceps'] },
+  { label: 'Pull', groups: ['lats', 'upper_back', 'biceps', 'forearms'] },
+  { label: 'Ноги', groups: ['quads', 'hamstrings', 'glutes', 'calves'] },
+  { label: 'Грудь + трицепс', groups: ['chest', 'triceps'] },
+  { label: 'Спина + бицепс', groups: ['lats', 'upper_back', 'lower_back', 'biceps'] },
+  { label: 'Плечи + руки', groups: ['shoulders', 'biceps', 'triceps', 'forearms'] },
+  { label: 'Кор', groups: ['abs', 'obliques', 'lower_back'] },
+  { label: 'Верх тела', groups: ['chest', 'upper_back', 'lats', 'shoulders', 'biceps', 'triceps', 'forearms'] },
+  { label: 'Всё тело', groups: [...MUSCLE_GROUPS] },
+];
+
+let active: Preset = PRESETS[0]!;
+
+function highlights(): Highlight[] {
+  return active.groups.map((group) => ({ group, intensity: 88 }));
+}
+
+function shared(): MuscleMapOptions {
+  return { gender, theme, highlights: highlights(), hoverHighlight: true, hoverIntensity: 100 };
+}
+
+const front = new MuscleMap(frontHost, { view: 'front', ...shared() });
+const back = new MuscleMap(backHost, { view: 'back', ...shared() });
+
+function sync(): void {
+  front.update(shared());
+  back.update(shared());
+}
 
 function applyTheme(): void {
-  // Flip the whole page to match the theme. The body image already contrasts
-  // (dark UI -> light body, light UI -> dark body).
+  // Flip the page to match; the body image swaps itself (dark UI -> light body).
   document.body.classList.toggle('theme-light', theme === 'light');
 }
 
-// --- controls --------------------------------------------------------------
+// --- preset chips ----------------------------------------------------------
 
-function segmented(id: string, attr: string, onPick: (value: string) => void): void {
+for (const preset of PRESETS) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'chip' + (preset === active ? ' active' : '');
+  btn.textContent = preset.label;
+  btn.addEventListener('click', () => {
+    active = preset;
+    presetList.querySelectorAll('.chip').forEach((b) => b.classList.toggle('active', b === btn));
+    sync();
+  });
+  presetList.appendChild(btn);
+}
+
+// --- segmented switchers ---------------------------------------------------
+
+function segmented(id: string, onPick: (value: string) => void): void {
   const seg = document.getElementById(id);
   seg?.addEventListener('click', (e) => {
     const btn = (e.target as Element).closest('button');
     if (!btn || !seg.contains(btn)) return;
     seg.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b === btn));
-    onPick(btn.dataset[attr] ?? '');
+    onPick((btn as HTMLButtonElement).dataset.value ?? '');
   });
 }
 
-segmented('gender-seg', 'gender', (value) => {
+segmented('gender-seg', (value) => {
   gender = value as Gender;
-  map.update({ gender, highlights: demoHighlights() });
-  renderSnippet();
+  sync();
 });
 
-segmented('view-seg', 'view', (value) => {
-  view = value as BodyView;
-  map.update({ view, highlights: demoHighlights() });
-  renderSnippet();
-});
-
-segmented('theme-seg', 'theme', (value) => {
+segmented('theme-seg', (value) => {
   theme = value as Theme;
-  map.update({ theme });
   applyTheme();
+  sync();
 });
-
-segmented('blend-seg', 'blend', (value) => {
-  blendMode = value;
-  map.update({ blendMode });
-});
-
-const intensityInput = document.getElementById('intensity') as HTMLInputElement;
-intensityInput.addEventListener('input', () => {
-  intensity = Number(intensityInput.value);
-  intensityVal.textContent = String(intensity);
-  map.update({ highlights: demoHighlights() });
-  renderSnippet();
-});
-
-const colorInput = document.getElementById('color') as HTMLInputElement;
-colorInput.addEventListener('input', () => {
-  color = colorInput.value;
-  map.update({ color });
-});
-
-// --- code snippet ----------------------------------------------------------
-
-function renderSnippet(): void {
-  const firstId = getMuscles(gender, view, MUSCLES)[0]?.id ?? 'pectoralis_right';
-  snippetEl.innerHTML = [
-    `<span class="k">import</span> { MuscleMap } <span class="k">from</span> <span class="s">'js-rich-body-highlighter/react'</span>;`,
-    ``,
-    `<span class="p">&lt;MuscleMap</span>`,
-    `  gender=<span class="s">"${gender}"</span> view=<span class="s">"${view}"</span>`,
-    `  highlights={[{ id: <span class="s">'${firstId}'</span>, intensity: ${intensity} }]}`,
-    `<span class="p">/&gt;</span>`,
-  ].join('\n');
-}
 
 applyTheme();
-renderSnippet();
