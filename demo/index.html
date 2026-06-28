@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -32,18 +32,20 @@
 
     <main class="stage">
       <div class="presets-wrap">
-        <span class="presets-label">Пресеты тренировок</span>
+        <span class="presets-label">Workout presets</span>
         <div id="presets" class="presets"></div>
       </div>
 
       <section class="bodies">
         <figure class="body-card">
           <div id="map-front" class="map"></div>
-          <figcaption>Спереди</figcaption>
+          <span id="name-front" class="hover-name"></span>
+          <figcaption>Front</figcaption>
         </figure>
         <figure class="body-card">
           <div id="map-back" class="map"></div>
-          <figcaption>Сзади</figcaption>
+          <span id="name-back" class="hover-name"></span>
+          <figcaption>Back</figcaption>
         </figure>
       </section>
     </main>
