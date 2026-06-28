@@ -4,7 +4,14 @@
   "description": "Premium, framework-agnostic muscle map. Highlights muscles with mix-blend-mode over a detailed body illustration for a rich, 3D look instead of flat polygon fills.",
   "type": "module",
   "license": "MIT",
-  "author": "",
+  "author": "crmapache",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crmapache/js-rich-body-highlighter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/crmapache/js-rich-body-highlighter/issues"
+  },
   "keywords": [
     "muscle",
     "anatomy",
