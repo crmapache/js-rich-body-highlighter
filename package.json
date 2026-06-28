@@ -71,6 +71,7 @@
   "scripts": {
     "dev": "vite",
     "dev:demo": "vite --config vite.demo.config.ts",
+    "dev:e2e": "vite --config e2e/vite.config.ts",
     "build": "tsup",
     "build:demo": "vite build --config vite.demo.config.ts",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.playground.json",
@@ -94,11 +95,14 @@
     }
   },
   "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "sharp": "^0.35.2",
+    "svelte": "^5.56.4",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
     "vite": "^8.1.0",
