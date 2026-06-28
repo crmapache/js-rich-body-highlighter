@@ -25,6 +25,7 @@ const OPTION_KEY_SET = {
   blendMode: true,
   hoverHighlight: true,
   hoverIntensity: true,
+  hoverColor: true,
   bodySrc: true,
   registry: true,
   onMuscleEnter: true,

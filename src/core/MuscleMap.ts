@@ -228,13 +228,19 @@ export class MuscleMap {
     const hoverOn = this.options.hoverHighlight ?? true;
     const hoverIntensity = this.options.hoverIntensity ?? DEFAULT_HOVER_INTENSITY;
 
+    const hoverColor = this.options.hoverColor;
+
     for (const [id, path] of this.paths) {
       const hit = resolved.get(id);
       const data = hit?.intensity ?? 0;
-      const hover = hoverOn && this.hoveredId === id ? hoverIntensity : 0;
+      const isHovered = hoverOn && this.hoveredId === id;
+      const hover = isHovered ? hoverIntensity : 0;
       const intensity = clamp(Math.max(data, hover), 0, 100);
       this.setOpacity(id, path, intensity / 100);
-      this.setFill(id, path, hit?.color ?? globalColor);
+      // Hovering can recolor the muscle (e.g. a distinct hover tint); otherwise
+      // it keeps its own highlight color, falling back to the global color.
+      const fill = isHovered && hoverColor ? hoverColor : (hit?.color ?? globalColor);
+      this.setFill(id, path, fill);
     }
   }
 

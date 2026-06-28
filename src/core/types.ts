@@ -52,6 +52,8 @@ export interface MuscleMapOptions {
   hoverHighlight?: boolean;
   /** Intensity (0–100) applied on hover. Default `35`. */
   hoverIntensity?: number;
+  /** Color used for the hovered muscle. Falls back to the muscle's own color. */
+  hoverColor?: string;
   /** Override the body image(s). Defaults to the bundled illustration. */
   bodySrc?: BodySrc;
   /** Custom registry. Defaults to the built-in `MUSCLES`. */
