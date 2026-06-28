@@ -75,6 +75,32 @@ body {
   box-shadow: 0 0 16px var(--accent);
 }
 
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.links a {
+  display: inline-flex;
+  color: var(--muted);
+  transition: color 0.15s, transform 0.1s;
+}
+
+.links a:hover {
+  color: var(--ink);
+}
+
+.links a:active {
+  transform: translateY(1px);
+}
+
 .switches {
   display: flex;
   gap: 12px;
@@ -131,7 +157,7 @@ body.theme-light .seg {
   flex-direction: column;
   align-items: center;
   gap: 14px;
-  margin-bottom: clamp(24px, 4vw, 44px);
+  margin-bottom: clamp(12px, 2vw, 20px);
 }
 
 .presets-label {
@@ -226,35 +252,46 @@ body.theme-light .body-card {
   color: var(--muted);
 }
 
+.hover-bar {
+  display: flex;
+  justify-content: center;
+  min-height: 34px;
+  margin-bottom: clamp(8px, 1.6vw, 16px);
+}
+
 .hover-name {
-  position: absolute;
-  left: 50%;
-  bottom: 44px;
-  transform: translateX(-50%) translateY(6px);
-  padding: 6px 13px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 16px;
   border-radius: 999px;
-  background: rgba(10, 12, 16, 0.82);
+  background: var(--card);
   border: 1px solid var(--line);
-  backdrop-filter: blur(8px);
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--ink);
   white-space: nowrap;
   opacity: 0;
-  pointer-events: none;
+  transform: translateY(4px);
   transition: opacity 0.16s, transform 0.16s;
-}
-
-body.theme-light .hover-name {
-  background: rgba(255, 255, 255, 0.9);
 }
 
 .hover-name.on {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: none;
 }
 
 @media (max-width: 720px) {
   .topbar {
+    justify-content: center;
+    gap: 14px;
+  }
+  .topbar-right {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    gap: 14px;
+  }
+  .switches {
+    flex-wrap: wrap;
     justify-content: center;
   }
 }

@@ -10,7 +10,7 @@
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
-  <body>
+  <body class="theme-light">
     <div class="bg" aria-hidden="true"></div>
 
     <header class="topbar">
@@ -18,14 +18,33 @@
         <span class="dot"></span>
         js-rich-body-highlighter
       </div>
-      <div class="switches">
-        <div class="seg" id="gender-seg" aria-label="Gender">
-          <button type="button" data-value="male">Male</button>
-          <button type="button" data-value="female" class="active">Female</button>
-        </div>
-        <div class="seg" id="theme-seg" aria-label="Theme">
-          <button type="button" data-value="light">Light</button>
-          <button type="button" data-value="dark" class="active">Dark</button>
+      <div class="topbar-right">
+        <nav class="links">
+          <a href="#" target="_blank" rel="noreferrer" aria-label="npm">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true">
+              <path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z" />
+            </svg>
+          </a>
+          <a href="#" target="_blank" rel="noreferrer" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true">
+              <path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17 4.6 18 4.9 18 4.9c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5Z" />
+            </svg>
+          </a>
+          <a href="#" target="_blank" rel="noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true">
+              <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.28 2.38 4.28 5.47v6.27ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.55V9h3.57v11.45ZM22.22 0H1.77C.8 0 0 .78 0 1.74v20.51C0 23.22.8 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.75V1.74C24 .78 23.2 0 22.22 0Z" />
+            </svg>
+          </a>
+        </nav>
+        <div class="switches">
+          <div class="seg" id="gender-seg" aria-label="Gender">
+            <button type="button" data-value="male" class="active">Male</button>
+            <button type="button" data-value="female">Female</button>
+          </div>
+          <div class="seg" id="theme-seg" aria-label="Theme">
+            <button type="button" data-value="light" class="active">Light</button>
+            <button type="button" data-value="dark">Dark</button>
+          </div>
         </div>
       </div>
     </header>
@@ -36,15 +55,17 @@
         <div id="presets" class="presets"></div>
       </div>
 
+      <div class="hover-bar">
+        <span id="hover-name" class="hover-name"></span>
+      </div>
+
       <section class="bodies">
         <figure class="body-card">
           <div id="map-front" class="map"></div>
-          <span id="name-front" class="hover-name"></span>
           <figcaption>Front</figcaption>
         </figure>
         <figure class="body-card">
           <div id="map-back" class="map"></div>
-          <span id="name-back" class="hover-name"></span>
           <figcaption>Back</figcaption>
         </figure>
       </section>

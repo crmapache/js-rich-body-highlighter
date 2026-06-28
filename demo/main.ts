@@ -10,12 +10,11 @@ import {
 
 const frontHost = document.getElementById('map-front') as HTMLElement;
 const backHost = document.getElementById('map-back') as HTMLElement;
-const frontName = document.getElementById('name-front') as HTMLElement;
-const backName = document.getElementById('name-back') as HTMLElement;
+const hoverName = document.getElementById('hover-name') as HTMLElement;
 const presetList = document.getElementById('presets') as HTMLElement;
 
-let gender: Gender = 'female';
-let theme: Theme = 'dark';
+let gender: Gender = 'male';
+let theme: Theme = 'light';
 
 // Three degrees of involvement per exercise (prime mover / synergist / stabilizer),
 // capped at 70% so the richest blend never washes out the illustration.
@@ -32,6 +31,7 @@ interface Preset {
 // how much. Targeting by `group` (not mask id) is the whole point: one entry
 // covers both bodies and both genders.
 const PRESETS: Preset[] = [
+  { label: 'Full body', primary: ['chest', 'lats', 'quads', 'glutes'], secondary: ['shoulders', 'upper_back', 'hamstrings', 'abs'], tertiary: ['biceps', 'triceps', 'forearms', 'lower_back', 'obliques', 'calves'] },
   { label: 'Push', primary: ['chest'], secondary: ['shoulders', 'triceps'] },
   { label: 'Pull', primary: ['lats'], secondary: ['upper_back', 'biceps'], tertiary: ['forearms'] },
   { label: 'Legs', primary: ['quads', 'glutes'], secondary: ['hamstrings'], tertiary: ['calves'] },
@@ -40,7 +40,6 @@ const PRESETS: Preset[] = [
   { label: 'Shoulders + Arms', primary: ['shoulders'], secondary: ['biceps', 'triceps'], tertiary: ['forearms'] },
   { label: 'Core', primary: ['abs'], secondary: ['obliques'], tertiary: ['lower_back'] },
   { label: 'Upper body', primary: ['chest', 'lats'], secondary: ['shoulders', 'upper_back'], tertiary: ['biceps', 'triceps', 'forearms'] },
-  { label: 'Full body', primary: ['chest', 'lats', 'quads', 'glutes'], secondary: ['shoulders', 'upper_back', 'hamstrings', 'abs'], tertiary: ['biceps', 'triceps', 'forearms', 'lower_back', 'obliques', 'calves'] },
 ];
 
 let active: Preset = PRESETS[0]!;
@@ -57,7 +56,7 @@ function highlights(): Highlight[] {
 // highlight) and shows its name.
 const HOVER_COLOR = '#2b6cff';
 
-function options(view: BodyView, label: HTMLElement): MuscleMapOptions {
+function options(view: BodyView): MuscleMapOptions {
   return {
     view,
     gender,
@@ -67,19 +66,19 @@ function options(view: BodyView, label: HTMLElement): MuscleMapOptions {
     hoverIntensity: 70,
     hoverColor: HOVER_COLOR,
     onMuscleEnter: (muscle) => {
-      label.textContent = muscle.name;
-      label.classList.add('on');
+      hoverName.textContent = muscle.name;
+      hoverName.classList.add('on');
     },
-    onMuscleLeave: () => label.classList.remove('on'),
+    onMuscleLeave: () => hoverName.classList.remove('on'),
   };
 }
 
-const front = new MuscleMap(frontHost, options('front', frontName));
-const back = new MuscleMap(backHost, options('back', backName));
+const front = new MuscleMap(frontHost, options('front'));
+const back = new MuscleMap(backHost, options('back'));
 
 function sync(): void {
-  front.update(options('front', frontName));
-  back.update(options('back', backName));
+  front.update(options('front'));
+  back.update(options('back'));
 }
 
 function applyTheme(): void {
