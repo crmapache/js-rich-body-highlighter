@@ -8,5 +8,8 @@ const resolvePath = (p: string) => fileURLToPath(new URL(p, import.meta.url));
  */
 export const libraryAlias = {
   'js-rich-body-highlighter/react': resolvePath('./src/react/index.tsx'),
+  'js-rich-body-highlighter/vue': resolvePath('./src/vue/index.ts'),
+  'js-rich-body-highlighter/svelte': resolvePath('./src/svelte/index.ts'),
+  'js-rich-body-highlighter/web-component': resolvePath('./src/web-component/index.ts'),
   'js-rich-body-highlighter': resolvePath('./src/index.ts'),
 };

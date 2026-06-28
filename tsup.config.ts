@@ -9,6 +9,9 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     'react/index': 'src/react/index.tsx',
+    'vue/index': 'src/vue/index.ts',
+    'svelte/index': 'src/svelte/index.ts',
+    'web-component/index': 'src/web-component/index.ts',
   },
   format: ['esm'],
   target: 'es2021',
@@ -17,8 +20,8 @@ export default defineConfig({
   splitting: true,
   treeshake: true,
   sourcemap: true,
-  // React stays a (peer) dependency of the consumer, never bundled in.
-  external: ['react', 'react-dom', 'react/jsx-runtime'],
+  // Framework runtimes stay (peer) dependencies of the consumer, never bundled in.
+  external: ['react', 'react-dom', 'react/jsx-runtime', 'vue'],
   esbuildOptions(options) {
     options.jsx = 'automatic';
   },
