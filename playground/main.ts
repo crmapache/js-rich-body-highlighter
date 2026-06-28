@@ -52,7 +52,7 @@ function displayRegistry(): MuscleDefinition[] {
   return registry.map((m) => (m.spread ? { ...m, d: applySpread(m.d, m.spread) } : m));
 }
 
-let view: BodyView = 'front';
+let view: BodyView = 'back';
 let gender: Gender = 'female';
 let theme: Theme = 'dark';
 let selectedId: string | null = null;
