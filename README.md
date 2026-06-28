@@ -1,7 +1,13 @@
 # js-rich-body-highlighter
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/crmapache/js-rich-body-highlighter/main/docs/hero.png" alt="Muscle map — front and back, with muscle groups highlighted over a detailed body illustration" width="640" />
+  <a href="https://js-rich-body-highlighter.vercel.app">
+    <img src="https://raw.githubusercontent.com/crmapache/js-rich-body-highlighter/main/docs/hero.png" alt="Muscle map — front and back, with muscle groups highlighted over a detailed body illustration" width="640" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://js-rich-body-highlighter.vercel.app"><b>Live demo →</b></a>
 </p>
 
 A premium, framework-agnostic muscle map. Instead of flat polygon fills (the
