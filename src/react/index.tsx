@@ -76,7 +76,7 @@ export function MuscleMap(props: MuscleMapProps): ReactElement {
   return <div ref={hostRef} className={props.className} style={props.style} />;
 }
 
-export type { MuscleMapOptions, Highlight, BodySrc } from '../core/types';
+export type { MuscleMapOptions, Highlight, BodySrc, MuscleEventTarget } from '../core/types';
 export type {
   MuscleDefinition,
   MuscleGroup,
@@ -86,4 +86,4 @@ export type {
   Gender,
   Theme,
 } from '../data/types';
-export { MUSCLES, getMuscle, getMuscles } from '../data/registry';
+export { MUSCLES, MUSCLE_GROUPS, getMuscle, getMuscles } from '../data/registry';

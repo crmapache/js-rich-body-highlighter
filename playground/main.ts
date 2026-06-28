@@ -69,7 +69,7 @@ const map = new MuscleMap(mapHost, {
   hoverHighlight: true,
   hoverIntensity: 80,
   highlights: computeHighlights(),
-  onMuscleClick: (id) => selectMuscle(id),
+  onMuscleClick: (muscle) => selectMuscle(muscle.id),
 });
 
 function viewMuscles(): MuscleDefinition[] {

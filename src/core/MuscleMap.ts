@@ -14,7 +14,7 @@ import {
   VIEWBOX_WIDTH,
   XLINK_NS,
 } from './constants';
-import type { MuscleMapOptions } from './types';
+import type { MuscleEventTarget, MuscleMapOptions } from './types';
 
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
 
@@ -48,6 +48,8 @@ export class MuscleMap {
 
   private readonly paths = new Map<string, SVGPathElement>();
   private readonly appliedOpacity = new Map<string, number>();
+  private readonly appliedColor = new Map<string, string>();
+  private currentById = new Map<string, MuscleDefinition>();
   private hoveredId: string | null = null;
   private destroyed = false;
 
@@ -97,10 +99,11 @@ export class MuscleMap {
     if (viewChanged || genderChanged || registryChanged) {
       this.renderPaths(); // re-applies color/blend/highlights for the new set
     } else {
-      if ((next.color ?? DEFAULT_COLOR) !== (prev.color ?? DEFAULT_COLOR)) this.applyColor();
       if ((next.blendMode ?? DEFAULT_BLEND_MODE) !== (prev.blendMode ?? DEFAULT_BLEND_MODE)) {
         this.applyBlend();
       }
+      // Highlights set both opacity AND per-mask fill, so a global color change
+      // is re-resolved here too — no separate color pass needed.
       this.applyHighlights();
     }
 
@@ -171,6 +174,8 @@ export class MuscleMap {
     this.layer.replaceChildren();
     this.paths.clear();
     this.appliedOpacity.clear();
+    this.appliedColor.clear();
+    this.currentById = new Map();
 
     const color = this.options.color ?? DEFAULT_COLOR;
     const blend = this.options.blendMode ?? DEFAULT_BLEND_MODE;
@@ -188,6 +193,8 @@ export class MuscleMap {
       this.layer.appendChild(path);
       this.paths.set(muscle.id, path);
       this.appliedOpacity.set(muscle.id, 0);
+      this.appliedColor.set(muscle.id, color);
+      this.currentById.set(muscle.id, muscle);
     }
 
     this.applyHighlights();
@@ -210,26 +217,24 @@ export class MuscleMap {
     this.svg.setAttribute('class', this.options.className ?? '');
   }
 
-  private applyColor(): void {
-    const color = this.options.color ?? DEFAULT_COLOR;
-    for (const path of this.paths.values()) path.setAttribute('fill', color);
-  }
-
   private applyBlend(): void {
     const blend = this.options.blendMode ?? DEFAULT_BLEND_MODE;
     for (const path of this.paths.values()) path.style.mixBlendMode = blend;
   }
 
   private applyHighlights(): void {
-    const intensities = this.highlightMap();
+    const resolved = this.resolveHighlights();
+    const globalColor = this.options.color ?? DEFAULT_COLOR;
     const hoverOn = this.options.hoverHighlight ?? true;
     const hoverIntensity = this.options.hoverIntensity ?? DEFAULT_HOVER_INTENSITY;
 
     for (const [id, path] of this.paths) {
-      const data = intensities.get(id) ?? 0;
+      const hit = resolved.get(id);
+      const data = hit?.intensity ?? 0;
       const hover = hoverOn && this.hoveredId === id ? hoverIntensity : 0;
       const intensity = clamp(Math.max(data, hover), 0, 100);
       this.setOpacity(id, path, intensity / 100);
+      this.setFill(id, path, hit?.color ?? globalColor);
     }
   }
 
@@ -239,13 +244,46 @@ export class MuscleMap {
     this.appliedOpacity.set(id, opacity);
   }
 
-  private highlightMap(): Map<string, number> {
-    const map = new Map<string, number>();
-    for (const h of this.options.highlights ?? []) {
-      // Merge duplicates by max so callers can't accidentally dim a muscle.
-      map.set(h.id, Math.max(map.get(h.id) ?? 0, h.intensity));
+  private setFill(id: string, path: SVGPathElement, color: string): void {
+    if (this.appliedColor.get(id) === color) return;
+    path.setAttribute('fill', color);
+    this.appliedColor.set(id, color);
+  }
+
+  /**
+   * Collapse the `highlights` option into a per-mask intensity + color, resolving
+   * `group` targets to every matching mask in the current gender + view. Duplicate
+   * hits merge by max intensity; the strongest contributor's color wins (and a
+   * color is never dropped in favor of none).
+   */
+  private resolveHighlights(): Map<string, { intensity: number; color?: string }> {
+    const out = new Map<string, { intensity: number; color?: string }>();
+    const byGroup = new Map<string, string[]>();
+    for (const m of this.currentById.values()) {
+      const arr = byGroup.get(m.group) ?? [];
+      arr.push(m.id);
+      byGroup.set(m.group, arr);
     }
-    return map;
+    const apply = (id: string, intensity: number, color?: string) => {
+      const prev = out.get(id);
+      if (!prev) {
+        out.set(id, { intensity, color });
+      } else if (intensity > prev.intensity) {
+        out.set(id, { intensity, color: color ?? prev.color });
+      } else if (color && !prev.color) {
+        prev.color = color;
+      }
+    };
+    for (const h of this.options.highlights ?? []) {
+      if (h.id && this.currentById.has(h.id)) apply(h.id, h.intensity, h.color);
+      if (h.group) for (const id of byGroup.get(h.group) ?? []) apply(id, h.intensity, h.color);
+    }
+    return out;
+  }
+
+  private muscleTarget(id: string): MuscleEventTarget {
+    const m = this.currentById.get(id);
+    return { id, group: m?.group ?? '', name: m?.name ?? '' };
   }
 
   private resolveBodySrc(): string {
@@ -265,15 +303,15 @@ export class MuscleMap {
     if (this.hoveredId === null) return;
     const prev = this.hoveredId;
     this.hoveredId = null;
-    this.options.onMuscleLeave?.(prev, event);
+    this.options.onMuscleLeave?.(this.muscleTarget(prev), event);
   }
 
   private setHovered(id: string | null, event?: MouseEvent): void {
     if (id === this.hoveredId) return;
     const prev = this.hoveredId;
     this.hoveredId = id;
-    if (prev !== null) this.options.onMuscleLeave?.(prev, event);
-    if (id !== null) this.options.onMuscleEnter?.(id, event);
+    if (prev !== null) this.options.onMuscleLeave?.(this.muscleTarget(prev), event);
+    if (id !== null) this.options.onMuscleEnter?.(this.muscleTarget(id), event);
     if (this.options.hoverHighlight ?? true) this.applyHighlights();
   }
 
@@ -292,7 +330,7 @@ export class MuscleMap {
   private readonly onClick = (event: MouseEvent): void => {
     const el = (event.target as Element | null)?.closest('[data-muscle-id]');
     const id = el?.getAttribute('data-muscle-id');
-    if (id) this.options.onMuscleClick?.(id, event);
+    if (id) this.options.onMuscleClick?.(this.muscleTarget(id), event);
   };
 }
 

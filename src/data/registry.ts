@@ -1,9 +1,31 @@
-import type { BodyView, Gender, MuscleDefinition } from './types';
+import type { BodyView, Gender, MuscleDefinition, MuscleGroup } from './types';
 import { FRONT_MUSCLES } from './muscles/front';
 import { BACK_MUSCLES } from './muscles/back';
 
 /** The full default muscle registry (all genders and views). */
 export const MUSCLES: MuscleDefinition[] = [...FRONT_MUSCLES, ...BACK_MUSCLES];
+
+/**
+ * Canonical muscle groups, in head-to-toe display order. Every entry in the
+ * built-in registry uses one of these. Handy for building legends, pickers, or
+ * preset UIs without hard-coding the list.
+ */
+export const MUSCLE_GROUPS: MuscleGroup[] = [
+  'chest',
+  'shoulders',
+  'biceps',
+  'triceps',
+  'forearms',
+  'abs',
+  'obliques',
+  'upper_back',
+  'lats',
+  'lower_back',
+  'glutes',
+  'quads',
+  'hamstrings',
+  'calves',
+];
 
 const byId = new Map<string, MuscleDefinition>(MUSCLES.map((m) => [m.id, m]));
 

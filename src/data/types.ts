@@ -12,16 +12,19 @@ export type MuscleSide = 'left' | 'right' | null;
  */
 export type MuscleGroup =
   | 'chest'
-  | 'back'
+  | 'lats'
+  | 'upper_back'
+  | 'lower_back'
   | 'shoulders'
-  | 'arms'
+  | 'biceps'
+  | 'triceps'
   | 'forearms'
   | 'abs'
-  | 'core'
-  | 'legs'
+  | 'quads'
+  | 'hamstrings'
   | 'glutes'
   | 'calves'
-  | 'neck'
+  | 'obliques'
   | (string & {});
 
 /** Per-mask nudge in source image pixels (1px === PX2MM viewBox units). */

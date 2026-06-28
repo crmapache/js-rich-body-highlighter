@@ -21,7 +21,7 @@ export const BACK_MUSCLES: MuscleDefinition[] = [
   {
     id: 'hamstrings',
     name: 'Hamstrings',
-    group: 'legs',
+    group: 'hamstrings',
     gender: 'male',
     side: null,
     view: 'back',
@@ -41,7 +41,7 @@ export const BACK_MUSCLES: MuscleDefinition[] = [
   {
     id: 'lower_back',
     name: 'Lower back',
-    group: 'back',
+    group: 'lower_back',
     gender: 'male',
     side: null,
     view: 'back',
@@ -51,7 +51,7 @@ export const BACK_MUSCLES: MuscleDefinition[] = [
   {
     id: 'lats',
     name: 'Lats',
-    group: 'back',
+    group: 'lats',
     gender: 'male',
     side: null,
     view: 'back',
@@ -61,7 +61,7 @@ export const BACK_MUSCLES: MuscleDefinition[] = [
   {
     id: 'upper_back',
     name: 'Upper back',
-    group: 'back',
+    group: 'upper_back',
     gender: 'male',
     side: null,
     view: 'back',
@@ -81,7 +81,7 @@ export const BACK_MUSCLES: MuscleDefinition[] = [
   {
     id: 'triceps',
     name: 'Triceps',
-    group: 'arms',
+    group: 'triceps',
     gender: 'male',
     side: null,
     view: 'back',
@@ -111,7 +111,7 @@ export const BACK_MUSCLES: MuscleDefinition[] = [
   {
     id: 'hamstrings_female',
     name: 'Hamstrings',
-    group: 'legs',
+    group: 'hamstrings',
     gender: 'female',
     side: null,
     view: 'back',
@@ -131,7 +131,7 @@ export const BACK_MUSCLES: MuscleDefinition[] = [
   {
     id: 'lower_back_female',
     name: 'Lower back',
-    group: 'back',
+    group: 'lower_back',
     gender: 'female',
     side: null,
     view: 'back',
@@ -141,7 +141,7 @@ export const BACK_MUSCLES: MuscleDefinition[] = [
   {
     id: 'lats_female',
     name: 'Lats',
-    group: 'back',
+    group: 'lats',
     gender: 'female',
     side: null,
     view: 'back',
@@ -151,7 +151,7 @@ export const BACK_MUSCLES: MuscleDefinition[] = [
   {
     id: 'upper_back_female',
     name: 'Upper back',
-    group: 'back',
+    group: 'upper_back',
     gender: 'female',
     side: null,
     view: 'back',
@@ -171,7 +171,7 @@ export const BACK_MUSCLES: MuscleDefinition[] = [
   {
     id: 'triceps_female',
     name: 'Triceps',
-    group: 'arms',
+    group: 'triceps',
     gender: 'female',
     side: null,
     view: 'back',

@@ -1,10 +1,27 @@
-import type { BodyView, Gender, MuscleDefinition, Theme } from '../data/types';
+import type { BodyView, Gender, MuscleDefinition, MuscleGroup, Theme } from '../data/types';
 
 export interface Highlight {
-  /** Muscle id from the registry. */
-  id: string;
+  /** Target one registry mask by its id. */
+  id?: string;
+  /**
+   * Or target a whole muscle group (e.g. `'chest'`) — lights up every mask of
+   * that group in the current gender + view. Most callers think in groups.
+   */
+  group?: MuscleGroup;
   /** 0–100. Mapped to layer opacity (0 = invisible, 100 = full strength). */
   intensity: number;
+  /** Per-highlight color. Falls back to the global `color` option. */
+  color?: string;
+}
+
+/** Identifies the muscle behind a hover/click event. */
+export interface MuscleEventTarget {
+  /** Registry mask id (e.g. `'pectoralis_female'`). */
+  id: string;
+  /** Muscle group (e.g. `'chest'`). */
+  group: MuscleGroup;
+  /** Human-readable name (e.g. `'Pectoralis major'`). */
+  name: string;
 }
 
 /**
@@ -42,9 +59,9 @@ export interface MuscleMapOptions {
   /** Extra class applied to the root `<svg>`. */
   className?: string;
   /** Fires when the pointer enters a muscle (no event when fired programmatically). */
-  onMuscleEnter?: (id: string, event?: MouseEvent) => void;
+  onMuscleEnter?: (muscle: MuscleEventTarget, event?: MouseEvent) => void;
   /** Fires when a muscle is left, incl. on view/gender/registry change while hovered. */
-  onMuscleLeave?: (id: string, event?: MouseEvent) => void;
+  onMuscleLeave?: (muscle: MuscleEventTarget, event?: MouseEvent) => void;
   /** Fires on click of a muscle. */
-  onMuscleClick?: (id: string, event: MouseEvent) => void;
+  onMuscleClick?: (muscle: MuscleEventTarget, event: MouseEvent) => void;
 }

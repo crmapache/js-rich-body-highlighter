@@ -32,7 +32,7 @@ export const FRONT_MUSCLES: MuscleDefinition[] = [
   {
     id: 'obliques',
     name: 'Obliques',
-    group: 'core',
+    group: 'obliques',
     gender: 'male',
     side: null,
     view: 'front',
@@ -52,7 +52,7 @@ export const FRONT_MUSCLES: MuscleDefinition[] = [
   {
     id: 'biceps',
     name: 'Biceps brachii',
-    group: 'arms',
+    group: 'biceps',
     gender: 'male',
     side: null,
     view: 'front',
@@ -72,7 +72,7 @@ export const FRONT_MUSCLES: MuscleDefinition[] = [
   {
     id: 'trapezius',
     name: 'Trapezius',
-    group: 'back',
+    group: 'upper_back',
     gender: 'male',
     side: null,
     view: 'front',
@@ -82,7 +82,7 @@ export const FRONT_MUSCLES: MuscleDefinition[] = [
   {
     id: 'quadriceps',
     name: 'Quadriceps',
-    group: 'legs',
+    group: 'quads',
     gender: 'male',
     side: null,
     view: 'front',
@@ -112,7 +112,7 @@ export const FRONT_MUSCLES: MuscleDefinition[] = [
   {
     id: 'quadriceps_female',
     name: 'Quadriceps',
-    group: 'legs',
+    group: 'quads',
     gender: 'female',
     side: null,
     view: 'front',
@@ -132,7 +132,7 @@ export const FRONT_MUSCLES: MuscleDefinition[] = [
   {
     id: 'obliques_female',
     name: 'Obliques',
-    group: 'core',
+    group: 'obliques',
     gender: 'female',
     side: null,
     view: 'front',
@@ -152,7 +152,7 @@ export const FRONT_MUSCLES: MuscleDefinition[] = [
   {
     id: 'trapezius_female',
     name: 'Trapezius',
-    group: 'back',
+    group: 'upper_back',
     gender: 'female',
     side: null,
     view: 'front',
@@ -172,7 +172,7 @@ export const FRONT_MUSCLES: MuscleDefinition[] = [
   {
     id: 'biceps_female',
     name: 'Biceps brachii',
-    group: 'arms',
+    group: 'biceps',
     gender: 'female',
     side: null,
     view: 'front',

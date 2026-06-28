@@ -1,5 +1,5 @@
 export { MuscleMap } from './core/MuscleMap';
-export type { MuscleMapOptions, Highlight, BodySrc } from './core/types';
+export type { MuscleMapOptions, Highlight, BodySrc, MuscleEventTarget } from './core/types';
 
 export {
   PX2MM,
@@ -12,7 +12,7 @@ export {
   DEFAULT_THEME,
 } from './core/constants';
 
-export { MUSCLES, getMuscle, getMuscles } from './data/registry';
+export { MUSCLES, MUSCLE_GROUPS, getMuscle, getMuscles } from './data/registry';
 export type {
   MuscleDefinition,
   MuscleGroup,
