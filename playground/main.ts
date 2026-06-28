@@ -293,7 +293,7 @@ function selectedGroup(selected: EditMuscle | null): HTMLElement {
     {
       class: 'btn',
       onClick: () => {
-        void navigator.clipboard?.writeText(registrySnippet(selected));
+        void navigator.clipboard?.writeText(readoutText(selected));
         copyBtn.textContent = 'Copied ✓';
         window.setTimeout(() => (copyBtn.textContent = 'Copy offset snippet'), 1100);
       },
@@ -349,12 +349,6 @@ function readoutText(m: EditMuscle): string {
   const ty = (y * PX2MM).toFixed(4);
   const spreadLine = m.spread ? `\nspread: ${m.spread}px` : '';
   return `${m.id}\noffset: { x: ${x}, y: ${y} }${spreadLine}\ntransform="translate(${tx} ${ty})"`;
-}
-
-function registrySnippet(m: MuscleDefinition): string {
-  const x = m.offset?.x ?? 0;
-  const y = m.offset?.y ?? 0;
-  return `offset: { x: ${x}, y: ${y} }`;
 }
 
 function updateReadout(m: EditMuscle): void {
