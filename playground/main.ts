@@ -53,12 +53,12 @@ function displayRegistry(): MuscleDefinition[] {
 }
 
 let view: BodyView = 'front';
-let gender: Gender = 'male';
+let gender: Gender = 'female';
 let theme: Theme = 'dark';
 let selectedId: string | null = null;
 let baseIntensity = 55; // strength of non-selected masks (so you can see them)
 let selectedIntensity = 100; // strength of the selected mask
-let zoom = 1; // magnify the figure (with masks) for precise positioning
+let zoom = 4; // magnify the figure (with masks) for precise positioning
 
 const map = new MuscleMap(mapHost, {
   view,

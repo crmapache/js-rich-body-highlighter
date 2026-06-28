@@ -13,7 +13,7 @@ const snippetEl = document.getElementById('snippet') as HTMLElement;
 const intensityVal = document.getElementById('intensity-val') as HTMLElement;
 
 let view: BodyView = 'front';
-let gender: Gender = 'male';
+let gender: Gender = 'female';
 let theme: Theme = 'dark';
 let intensity = 72;
 let color = '#ff2d2d';
