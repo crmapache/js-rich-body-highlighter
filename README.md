@@ -1,5 +1,9 @@
 # js-rich-body-highlighter
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/crmapache/js-rich-body-highlighter/main/docs/hero.png" alt="Muscle map — front and back, with muscle groups highlighted over a detailed body illustration" width="640" />
+</p>
+
 A premium, framework-agnostic muscle map. Instead of flat polygon fills (the
 look every other body-highlighter library ships), it highlights muscles with
 `mix-blend-mode` over a **detailed body illustration**. The color settles into
@@ -173,43 +177,6 @@ whole set. The JS engine itself is ~30 KB gzipped.
 
 To keep images out of your build entirely (e.g. serve from a CDN), pass
 `bodySrc` (a single URL, or `{ front, back }`); it wins over the bundled default.
-
-## Adding a muscle
-
-1. Trace the muscle in Inkscape over the body image, export Optimized SVG.
-2. Add one entry to `src/data/muscles/front.ts` (or `back.ts`):
-
-   ```ts
-   {
-     id: 'biceps_female',
-     name: 'Biceps brachii',
-     group: 'biceps',
-     gender: 'female',
-     side: null,
-     view: 'front',
-     offset: { x: 289, y: 110 },
-     d: 'M... z',
-   }
-   ```
-
-3. Run the playground, pick the matching gender + view, check the fit, nudge with
-   arrow keys, and copy the ready-to-paste `offset`.
-
-Masks are filtered by `gender` + `view`; male and female anatomy differ, so each
-needs its own masks. `theme` only swaps the body image, so light/dark share masks.
-`side` uses the depicted person's side: on the front view, the body's right
-muscle is on the **left** of the screen.
-
-## Development
-
-```sh
-npm install
-npm run dev               # mask-authoring playground at http://localhost:5173
-npm run dev:demo          # showcase/preview (deployed to Vercel)
-npm run build             # build dist/ (core + all wrappers) with tsup
-npm run typecheck
-npm run convert:bodies    # re-export assets-src/*.png -> src/assets/bodies/*.webp
-```
 
 ## License
 
