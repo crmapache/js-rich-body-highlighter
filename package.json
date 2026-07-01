@@ -1,6 +1,6 @@
 {
   "name": "js-rich-body-highlighter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Premium, framework-agnostic muscle map. Highlights muscles with mix-blend-mode over a detailed body illustration for a rich, 3D look instead of flat polygon fills.",
   "type": "module",
   "license": "MIT",
