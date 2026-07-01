@@ -105,6 +105,15 @@ export class MuscleMap {
       // Highlights set both opacity AND per-mask fill, so a global color change
       // is re-resolved here too — no separate color pass needed.
       this.applyHighlights();
+
+      if (
+        (next.hoverHighlight ?? true) !== (prev.hoverHighlight ?? true) ||
+        next.onMuscleEnter !== prev.onMuscleEnter ||
+        next.onMuscleLeave !== prev.onMuscleLeave ||
+        next.onMuscleClick !== prev.onMuscleClick
+      ) {
+        this.applyCursor();
+      }
     }
 
     if (viewChanged || genderChanged || themeChanged || bodyChanged) this.applyImage();
@@ -189,7 +198,6 @@ export class MuscleMap {
       if (transform) path.setAttribute('transform', transform);
       path.style.mixBlendMode = blend;
       path.style.opacity = '0';
-      path.style.cursor = 'pointer';
       this.layer.appendChild(path);
       this.paths.set(muscle.id, path);
       this.appliedOpacity.set(muscle.id, 0);
@@ -198,6 +206,7 @@ export class MuscleMap {
     }
 
     this.applyHighlights();
+    this.applyCursor();
   }
 
   // --- granular appliers ---------------------------------------------------
@@ -220,6 +229,21 @@ export class MuscleMap {
   private applyBlend(): void {
     const blend = this.options.blendMode ?? DEFAULT_BLEND_MODE;
     for (const path of this.paths.values()) path.style.mixBlendMode = blend;
+  }
+
+  /**
+   * `pointer` only makes sense if hovering/clicking a mask actually does
+   * something: the built-in hover highlight is on, or the caller listens for
+   * hover/click. Otherwise leave the cursor at its default.
+   */
+  private applyCursor(): void {
+    const interactive =
+      (this.options.hoverHighlight ?? true) ||
+      !!this.options.onMuscleEnter ||
+      !!this.options.onMuscleLeave ||
+      !!this.options.onMuscleClick;
+    const cursor = interactive ? 'pointer' : '';
+    for (const path of this.paths.values()) path.style.cursor = cursor;
   }
 
   private applyHighlights(): void {
